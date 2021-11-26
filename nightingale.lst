@@ -1,0 +1,59 @@
+mads 2.0.6 build 58 (28 Jan 17)
+Source: nightingale.asm
+     1 				; Nightingale - Fantasy Adventure for Atari 2600
+     2 				; Author: Tyler Taylor
+     3 				; https://github.com/TylerOliverTaylor/Nightingale
+     4 				; README.md file contains game description and build information.
+     5 				; Assemble in MADS: mads -l -t nightingale.asm
+     6
+     7 				    org $2000           ; Start of program in memory
+     8
+     9 = 0058			SAVMSC = $0058          ; Screen memory address
+    10 = 0230			SDLSTL = $0230          ; Display list starting address
+    11
+    12 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    13 				;   Variables
+    14 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    15 = 4000			screen = $4000          ; Screen buffer
+    16 = 0070			blank8 = $70            ; 8 blank lines
+    17 = 0005			antic5 = 5              ; ANTIC mode 5
+    18 = 0040			lms = $40               ; Load Memory Scan
+    19 = 0040			jvb = $40               ; Jump while vertical blank
+    20
+    21
+    22 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    23 				;   Load Display List
+    24 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    25 FFFF> 2000-2039> A9 1A	    lda #<dlist         
+    26 2002 8D 30 02		    sta SDLSTL
+    27 2005 A9 20		    lda #>dlist
+    28 2007 8D 31 02		    sta SDLSTL+1
+    29
+    30 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    31 				;   MAIN
+    32 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    33 200A A0 00		    ldy #0              ; Loads y with "0" this will allow indirect addressing mode in line 14 
+    34 200C			loop
+    35 200C B9 2E 20		    lda hello,y         ; Loads the a register
+    36 200F 99 00 40		    sta screen,y        ; Stores into screen memory
+    37 2012 C8			    iny                 ; Increment y by 1
+    38 2013 C0 0C		    cpy #12             ; Compairs y to 12, represents the 12 characters in hello, if != 12 loops back else break loop
+    39 2015 D0 F5		    bne loop           
+    40
+    41 2017 4C 17 20		    jmp *               ; * means jump to self...this keeps the processor busy...basically 6502 version of "GOTO"
+    42
+    43 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    44 				;   Display List
+    45 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    46 201A			dlist
+    47 201A 70 70 70		    .byte blank8, blank8, blank8
+    48 201D 45 00 40		    .byte antic5 + lms, <screen , >screen
+    49 2020 05 05 05 05 05 05	    .byte antic5, antic5, antic5, antic5, antic5, antic5
+    50 2026 05 05 05 05 05	    .byte antic5, antic5, antic5, antic5, antic5
+    51 202B 40 1A 20		    .byte jvb, <dlist, >dlist
+    52
+    53 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    54 				;   DATA
+    55 				;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    56 202E			hello
+    57 202E 28 25 2C 2C 2F 00 +     .byte "HELLO ATARI!"
