@@ -1,5 +1,5 @@
 # Nightingale
- Adventure game written for the 6502.
+ Adventure game written for the 6502. (in-progress)
 
 Editor:
 - VSCode
